@@ -2,21 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"fakhry/go-sql/controllers"
+	"fakhry/go-sql/entities"
 	"fmt"
 	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 )
-
-type User struct {
-	Id          string
-	Name        string
-	Email       string
-	Password    string
-	Address     string
-	PhoneNumber string
-}
 
 func main() {
 	var db *sql.DB
@@ -50,31 +43,13 @@ func main() {
 
 	switch pilihan {
 	case 1:
-		// READ DATA --> SELECT
-		// proses menjalankan query select
-		rows, errSelect := db.Query("select id, name, email, password, address from users")
-
-		if errSelect != nil { // ketika terjadi error saat menjalankan select
-			log.Fatal("error run query select ", errSelect.Error())
-		}
-		// variabel untuk menyimpan semua data yang dibaca di db.Query
-		var allUsers []User
-		// membaca per baris
-		for rows.Next() {
-			var dataUserRow User // variabel untuk menyimpan data per baris
-			errScan := rows.Scan(&dataUserRow.Id, &dataUserRow.Name, &dataUserRow.Email, &dataUserRow.Password, &dataUserRow.Address)
-			if errScan != nil {
-				log.Fatal("error scan select", errScan.Error())
-			}
-			// menambahkan tiap baris data yang dibaca ke slice
-			allUsers = append(allUsers, dataUserRow)
-		}
-		// fmt.Println("data all users:\n", allUsers)
-		for _, v := range allUsers {
+		result := controllers.GetAllUserController(db)
+		for _, v := range result {
 			fmt.Println("nama:", v.Name)
 		}
+
 	case 2:
-		newUser := User{}
+		newUser := entities.User{}
 		fmt.Println("Input new ID:")
 		fmt.Scanln(&newUser.Id)
 		fmt.Println("Input new Name:")
