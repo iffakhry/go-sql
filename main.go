@@ -74,7 +74,38 @@ func main() {
 			fmt.Println("nama:", v.Name)
 		}
 	case 2:
-		fmt.Println("insert data")
+		newUser := User{}
+		fmt.Println("Input new ID:")
+		fmt.Scanln(&newUser.Id)
+		fmt.Println("Input new Name:")
+		fmt.Scanln(&newUser.Name)
+		fmt.Println("Input new Email:")
+		fmt.Scanln(&newUser.Email)
+		fmt.Println("Input new Password:")
+		fmt.Scanln(&newUser.Password)
+		fmt.Println("Input new Address:")
+		fmt.Scanln(&newUser.Address)
+		fmt.Println("Input new Phone Number:")
+		fmt.Scanln(&newUser.PhoneNumber)
+
+		// result, errInsert := db.Exec("INSERT INTO users (id, name, email, password, address, phone_number) VALUES (?, ?, ?, ?,?,?)", newUser.Id, newUser.Name, newUser.Email, newUser.Password, newUser.Address, newUser.PhoneNumber)
+
+		statement, errPrepare := db.Prepare("INSERT INTO users (id, name, email, password, address, phone_number) VALUES (?, ?, ?, ?,?,?)")
+		if errPrepare != nil {
+			log.Fatal("error prepare insert", errPrepare.Error())
+		}
+		result, errInsert := statement.Exec(newUser.Id, newUser.Name, newUser.Email, newUser.Password, newUser.Address, newUser.PhoneNumber)
+
+		if errInsert != nil {
+			log.Fatal("error insert", errInsert.Error())
+		} else {
+			row, _ := result.RowsAffected()
+			if row > 0 {
+				fmt.Println("success Insert data")
+			} else {
+				fmt.Println("failed to insert data")
+			}
+		}
 
 	case 3:
 		fmt.Println("Update data")
